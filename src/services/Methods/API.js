@@ -4,14 +4,14 @@ export const headerJson = {
 }
 
 export const GetData = async (parameters = "") => {
-    const res = await fetch(`http://127.0.0.1:8080/api/v1/tasks-all${parameters}`, {method: 'GET',headers: headerJson})
+    const res = await fetch(`http://18.217.183.126:8080/api/v1/tasks-all${parameters}`, {method: 'GET',headers: headerJson})
     const json = await res.json()
     
     return json
 }
 
 export const PostData = async (data) => {
-    const res = await fetch('http://127.0.0.1:8080/api/v1/tasks', {
+    const res = await fetch('http://18.217.183.126:8080/api/v1/tasks', {
         method: 'POST',
         headers: headerJson,
         body: JSON.stringify(data)
@@ -23,7 +23,7 @@ export const PostData = async (data) => {
 }
 
 export const PutData = async (id, parameters = "") => {
-    const res = await fetch(`http://127.0.0.1:8080/api/v1/tasks/${id}${parameters}`, {
+    const res = await fetch(`http://18.217.183.126:8080/api/v1/tasks/${id}${parameters}`, {
         method: 'PUT',
         headers: headerJson,
         body: ''
@@ -33,7 +33,7 @@ export const PutData = async (id, parameters = "") => {
 }
 
 export const DeleteData = async (id) => {
-    const res = await fetch(`http://127.0.0.1:8080/api/v1/tasks/${id}`, {
+    const res = await fetch(`http://18.217.183.126:8080/api/v1/tasks/${id}`, {
         method: 'DELETE',
         headers: headerJson,
         body: ''
