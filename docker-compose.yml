@@ -3,7 +3,7 @@ version: '3'
 services:
   frontend:
     build: .
-    container_name: react-nginx
+    container_name: teste-supero-front
     volumes:
       - /app/node_modules
       - .:/app

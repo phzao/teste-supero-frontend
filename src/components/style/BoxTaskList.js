@@ -2,6 +2,20 @@ import React, { Component }  from 'react';
 import { GetData, PutData, DeleteData } from '../../services/Methods/API';
 import { BoxItemTask } from './BoxItemTask';
 import ModalConfirmBasic from '../Modal';
+import Modal from 'react-modal';
+import serializeForm from 'form-serialize';
+
+const customStyles = {
+    content : {
+      top                   : '50%',
+      left                  : '50%',
+      width                 : '50%',
+      right                 : 'auto',
+      bottom                : 'auto',
+      marginRight           : '-50%',
+      transform             : 'translate(-50%, -50%)'
+    }
+  };
 
 class BoxTaskList extends Component {
     constructor() {
@@ -11,6 +25,7 @@ class BoxTaskList extends Component {
         task:{},
         queryOpen: "",
         queryCloseDone: "",
+        isOpenEdit: false,
         isOpenReopen: false,
         isOpenDelete: false,
         isOpenDone: false
@@ -19,6 +34,9 @@ class BoxTaskList extends Component {
 
     ReopenOpen = () => this.setState({isOpenReopen: true});
     ReopenClose = () => this.setState({isOpenReopen: false});
+
+    EditOpen = () => this.setState({isOpenEdit: true});
+    EditClose = () => this.setState({isOpenEdit: false});
 
     DeleteOpen = () => this.setState({isOpenDelete: true});
     DeleteClose = () => this.setState({isOpenDelete: false});
@@ -29,7 +47,7 @@ class BoxTaskList extends Component {
     getData = async () => {
       const list = await GetData();
       if (list.status=== "success") {
-        this.setState({list: list.data});
+        this.setState({list: []}, ()=>this.setState({list: list.data}));
       }
     }
 
@@ -39,6 +57,21 @@ class BoxTaskList extends Component {
   
     componentDidMount() {
         this.getData()
+    }
+
+    handle = async (event) => {
+        event.preventDefault();
+        const { task } = this.state
+
+        const formData = serializeForm(event.target, { hash: true })
+        const save = await PutData(task.id, "", formData);
+
+        if (save===204) {
+            this.clearTask()
+            this.getData()
+        }
+
+        this.EditClose()
     }
 
     componentDidUpdate() {
@@ -63,9 +96,7 @@ class BoxTaskList extends Component {
         this.clearTask()
     }
 
-    clearTask = () => {
-        this.setState({task: {}})
-    }
+    clearTask = () => this.setState({task: {}})
 
     setOpen = async (id) => {
         const status = await PutData(id, "/open")
@@ -90,8 +121,8 @@ class BoxTaskList extends Component {
     }
   
     render() {
-      const { list, isOpenReopen, isOpenDelete, queryCloseDone, queryOpen, isOpenDone, task } = this.state
-
+      const { list, isOpenReopen, isOpenDelete, queryCloseDone, queryOpen, isOpenDone, isOpenEdit, task } = this.state
+        
       return (
           <div>
               <ModalConfirmBasic
@@ -102,9 +133,7 @@ class BoxTaskList extends Component {
                     this.ReopenClose()
                     this.setOpen(task.id)
                 }}
-                onCancel={()=>{
-                    this.setState({task: {}}, ()=>this.ReopenClose())
-                }}
+                onCancel={()=>this.setState({task: {}}, ()=>this.ReopenClose())}
                />
 
             <ModalConfirmBasic
@@ -115,9 +144,7 @@ class BoxTaskList extends Component {
                     this.DoneClose()
                     this.setDone(task.id)
                 }}
-                onCancel={()=>{
-                    this.setState({task: {}}, ()=>this.DoneClose())
-                }}
+                onCancel={()=> this.setState({task: {}}, ()=>this.DoneClose())}
                />
 
             <ModalConfirmBasic
@@ -128,10 +155,40 @@ class BoxTaskList extends Component {
                     this.DeleteClose()
                     this.delete(task.id)
                 }}
-                onCancel={()=>{
-                    this.setState({task: {}}, ()=>this.DeleteClose())
-                }}
+                onCancel={()=>this.setState({task: {}}, ()=>this.DeleteClose())}
                />
+               <Modal
+                    isOpen={isOpenEdit}
+                    style={customStyles}
+                    contentLabel="Example Modal"
+                    >
+                    <div className="row">
+                        <div className="col">
+                            <span className="text-center">
+                                <h4> Editar Task </h4>
+                            </span>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col">
+                            <form onSubmit={ this.handle }>
+                                <div className="row">
+                                    <div className="col">
+                                        <input className="form-control form-control-sm" maxLength={50} defaultValue={task.title} type="text" name="title" placeholder="Titulo da Task" />
+                                    </div>
+                                </div>
+                                <div className="row mt-3">
+                                    <div className="col col-sm text-right">
+                                        <button type="submit" className="btn btn-sm m-2 btn-success">Atualizar</button>
+                                    
+                                        <button type="button" className="btn btn-sm m-2 btn-danger" onClick={()=>this.EditClose()}>Cancelar</button>
+                                    </div>
+                                </div>
+                                
+                            </form>
+                        </div>
+                    </div>
+            </Modal> 
             <div className="row">
                 <div className="col-md-6">
                     <div className="my-3 p-3 bg-white rounded shadow-sm">
@@ -169,7 +226,8 @@ class BoxTaskList extends Component {
                                             key={i} 
                                             colorBox={colorBox} 
                                             task={task} 
-                                            onDone={()=>this.setState({task: task}, ()=>this.DoneOpen())} 
+                                            onDone={()=>this.setState({task: task}, ()=>this.DoneOpen())}
+                                            onEdit={()=>this.setState({task: task}, ()=>this.EditOpen())}
                                             onDelete={()=>this.setState({task: task}, ()=>this.DeleteOpen())} />
                             })}
                     </div>
@@ -211,9 +269,8 @@ class BoxTaskList extends Component {
                                             key={i} 
                                             colorBox={colorBox} 
                                             task={task} 
-                                            onOpen={()=>{
-                                                this.setState({task: task}, ()=>this.ReopenOpen())
-                                            }
+                                            onEdit={()=>this.setState({task: task}, ()=>this.EditOpen())}
+                                            onOpen={()=>this.setState({task: task}, ()=>this.ReopenOpen())
                                             } />
                             })}
                     </div>

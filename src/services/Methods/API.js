@@ -22,11 +22,11 @@ export const PostData = async (data) => {
     return json
 }
 
-export const PutData = async (id, parameters = "") => {
+export const PutData = async (id, parameters = "", data = "") => {
     const res = await fetch(`http://18.217.183.126:8080/api/v1/tasks/${id}${parameters}`, {
         method: 'PUT',
         headers: headerJson,
-        body: ''
+        body: JSON.stringify(data)
     })
 
     return res.status

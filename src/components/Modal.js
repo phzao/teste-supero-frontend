@@ -43,12 +43,12 @@ class ModalConfirmBasic extends Component {
                         <div className="col">{content}</div>
                     </div>
                     <div className="row">
-                        <div className="col-md-6">
+                        <div className="col-4">
                         </div>
-                        <div className="col-md-3 text-right">
+                        <div className="col-4 text-right">
                             <button type="button" className="btn btn-sm btn-success" onClick={()=>this.props.onConfirm()}>Confirmar</button>
                         </div>
-                        <div className="col-md-3 text-right">
+                        <div className="col-4 text-right">
                             <button type="button" className="btn btn-sm btn-danger" onClick={()=>this.props.onCancel()}>Cancelar</button>
                         </div>
                     </div>

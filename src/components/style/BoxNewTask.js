@@ -1,6 +1,5 @@
 import React, { Component }  from 'react';
 import { PostData } from '../../services/Methods/API';
-
 import serializeForm from 'form-serialize';
 
 class BoxNewTask extends Component {
